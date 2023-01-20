@@ -1,0 +1,21 @@
+diff --git a/core/assets/scaffold/files/htaccess b/core/assets/scaffold/files/htaccess
+index 4d19147cc4..89ac432c4b 100644
+--- a/core/assets/scaffold/files/htaccess
++++ b/core/assets/scaffold/files/htaccess
+@@ -180,8 +180,14 @@ AddEncoding gzip svgz
+ 
+ # Various header fixes.
+ <IfModule mod_headers.c>
+-  # Disable content sniffing, since it's an attack vector.
+-  Header always set X-Content-Type-Options nosniff
++  # Disable content sniffing for all responses, since it's an attack vector.
++  # This header is also set in FinishResponseSubscriber, which depending on
++  # Apache configuration might get placed in the 'onsuccess' table. To prevent
++  # header duplication, unset that one prior to setting in the 'always' table.
++  # See "To circumvent this limitation..." in
++  # https://httpd.apache.org/docs/current/mod/mod_headers.html.
++  Header onsuccess unset X-Content-Type-Options
++  # Header always set X-Content-Type-Options nosniff
+   # Disable Proxy header, since it's an attack vector.
+   RequestHeader unset Proxy
+ </IfModule>
